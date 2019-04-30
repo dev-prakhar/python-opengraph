@@ -11,11 +11,11 @@ class OpenGraph(object):
     useragent = None
     __data__ = {}
 
-    def __init__(self, url=None, html=None, useragent=None):
+    def __init__(self, url=None, html=None, useragent=None, html_parser='html.parser'):
         if useragent:
             self.useragent = useragent
         content = html or self._fetch(url)
-        self._parse(content)
+        self._parse(content, html_parser)
 
     def __contains__(self, item):
         return item in self.__data__
@@ -23,8 +23,7 @@ class OpenGraph(object):
     def __getattr__(self, name):
         if name in self.__data__:
             return self.__data__[name]
-        raise AttributeError(
-            'Open Graph object has no attribute "{}"'.format(name))
+        raise AttributeError('Open Graph object has no attribute "{}"'.format(name))
 
     def __repr__(self):
         return self.__data__.__str__()
@@ -35,14 +34,12 @@ class OpenGraph(object):
     def _fetch(self, url):
         headers = {}
         if self.useragent:
-            headers = {
-                'user-agent': self.useragent
-            }
+            headers = {'user-agent': self.useragent}
         response = requests.get(url, headers=headers)
         return response.text
 
-    def _parse(self, html):
-        doc = BeautifulSoup(html)
+    def _parse(self, html, html_parser):
+        doc = BeautifulSoup(html, html_parser)
         ogs = doc.html.head.findAll(property=re.compile(r'^og'))
 
         for og in ogs:
