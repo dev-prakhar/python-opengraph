@@ -58,3 +58,6 @@ target/
 
 # SublimeText project/workspace
 *.sublime*
+
+# Pycharm
+.idea
